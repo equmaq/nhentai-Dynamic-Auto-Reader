@@ -28,7 +28,7 @@ This Tampermonkey userscript uses OCR (Optical Character Recognition) to automat
    - [Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)
    - [Safari](https://apps.apple.com/app/tampermonkey/id1482490089)
 
-2. **Install the script**: [Click here](userscript.js) to view the raw script, then click Tampermonkey's install button or manually paste into a new Tampermonkey script
+2. **Install the script**: [Click here](https://update.sleazyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js) to view the raw script, then click Tampermonkey's install button or manually paste into a new Tampermonkey script
 
 3. **Navigate to an nhentai gallery** - the script activates automatically on gallery pages
 
@@ -155,6 +155,7 @@ The script attempts to fetch images from multiple nhentai CDN hosts (`i1.nhentai
 - Tesseract.js can be slow on older devices or poor connections
 - Increase "OCR Fallback" time if pages are advancing too quickly
 - Or use a lower "Char Multiplier" if you want faster overall pacing
+- GIFs aren't supported yet; once implemented, they will be treated as a single frame for OCR purposes
 
 **Progress bar looks broken**
 - This is a known cosmetic issue; timing is still accurate
