@@ -31,6 +31,8 @@ This Tampermonkey userscript uses OCR (Optical Character Recognition) to automat
 2. **Install the script**: [Click here](https://update.sleazyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js) to view the raw script, then click Tampermonkey's install button or manually paste into a new Tampermonkey script
 
 3. **Navigate to an nhentai gallery** - the script activates automatically on gallery pages
+   
+4. It's gonna ask for access to a cross-origin resource (the gallery images and js library that handles text extraction), choose "Always Allow All Domains"
 
 ---
 
