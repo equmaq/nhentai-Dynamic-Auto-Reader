@@ -37,14 +37,13 @@
         MANUAL_NAV_FORWARD: 'continue',
         MANUAL_NAV_BACKWARD: 'pause',
 
-        // THEME PRESETS - Edit this array to add/change themes
+        // THEME PRESETS
         THEME_PRESETS: [
-            { name: "nhentai Pink", color: "#ed2553" },
-            { name: "R34 Green", color: "#2ecc71" },
-            { name: "Midnight Blue", color: "#3498db" },
-            { name: "Toxic Acid", color: "#bada55" },
-            { name: "Sakura", color: "#ffb7c5" },
-            { name: "Sunset Orange", color: "#e67e22" },
+            { name: "nhentai Pink", color: "#ed2754" },
+            { name: "R34 Green", color: "#aae5a4" },
+            { name: "E621 Blue", color: "#05539e" },
+            { name: "Havenly Red", color: "#f90816" },
+            { name: "Pornhub Orange", color: "#ff9000" },
             { name: "Custom", color: "#000000" } // Placeholder for custom input
         ]
     };
@@ -65,7 +64,7 @@
         enableSpacebar: GM_getValue("nh_enableSpacebar", false),
         // Phase 3: Theme
         themeName: GM_getValue("nh_themeName", "nhentai Pink"),
-        customThemeColor: GM_getValue("nh_customThemeColor", "#ed2553")
+        customThemeColor: GM_getValue("nh_customThemeColor", "#ed2754")
     };
 
     /**********************
@@ -466,7 +465,7 @@
             ocrFallbackS: CONFIG.OCR_FALLBACK_S, manualNavForward: CONFIG.MANUAL_NAV_FORWARD,
             manualNavBackward: CONFIG.MANUAL_NAV_BACKWARD, showOcrProgress: true,
             showPageCounter: true, showCurrentTimer: false, showTotalTimer: false,
-            enableSpacebar: false, themeName: "nhentai Pink", customThemeColor: "#ed2553"
+            enableSpacebar: false, themeName: "nhentai Pink", customThemeColor: "#ed2754"
         });
         DEBUG = CONFIG.DEBUG_DEFAULT;
         settingsBtn.click();
