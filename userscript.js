@@ -5,7 +5,7 @@
 // @icon         https://www.google.com/s2/favicons?domain=nhentai.net
 // @namespace    http://tampermonkey.net
 // @updateURL    https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/main/userscript.js
-// @version      1.4
+// @version      1.4.1
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest
