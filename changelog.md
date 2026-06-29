@@ -2,7 +2,7 @@
 
 All notable changes to **nhentai Dynamic Auto Reader** will be documented in this file.
 
-## [v1.4] - 2024-XX-XX
+## [v1.4] - 2026-06-29
 
 ### ✨ Added
 - **Dynamic Theme System**: Full UI color customization with 6 built-in presets (`nhentai Pink`, `R34 Green`, `Midnight Blue`, `Toxic Acid`, `Sakura`, `Sunset Orange`) and a custom hex color picker.
