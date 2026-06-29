@@ -1,10 +1,12 @@
-# nhentai Dynamic Auto Reader
+# nhentai Dynamic Auto Reader (v1.4)
 
-> Automatically extracts text from nhentai galleries and auto-reads pages based on character count, with user-configurable timing and manual navigation handling.
+> Automatically extracts text from nhentai galleries and auto-reads pages based on character count, with user-configurable timing, real-time tracking, and dynamic theming.
 
 ## Quick Overview
 
-This Tampermonkey userscript uses OCR (Optical Character Recognition) to automatically determine how long to display each page of a manga gallery based on the amount of text present. Pages with more text get more reading time; pages with little text move faster. Perfect for manga-style content that mixes dense text and image-heavy pages.
+This Tampermonkey userscript uses OCR (Optical Character Recognition) to automatically determine how long to display each page of a manga gallery based on the amount of text present. Pages with more text get more reading time; pages with little text move faster. 
+
+**v1.4** introduces a complete UI overhaul featuring a **dynamic theme system**, **real-time ETA tracking**, **OCR progress indicators**, and improved **SPA navigation handling** that works seamlessly across the entire site.
 
 ---
 
@@ -16,8 +18,9 @@ This Tampermonkey userscript uses OCR (Optical Character Recognition) to automat
 - **Automatic text extraction**: Uses Tesseract.js to run OCR on gallery images
 - **Smart fallback handling**: If OCR takes time, uses a configurable fallback delay; switches to character-based timing once OCR completes
 - **Manual navigation support**: Detects when you manually navigate forward/backward and responds according to your settings (continue or pause)
-- **Visual feedback**: Progress bar shows reading time remaining for each page
-- **Session persistence**: All settings and debug preferences save across browser sessions
+- **Real-time tracking**: Live page counter, current page countdown, and total gallery ETA
+- **Dynamic theming**: Fully customizable accent colors with presets and custom hex inputs
+- **Session persistence**: All settings, themes, and debug preferences save across browser sessions
 
 ---
 
@@ -45,6 +48,10 @@ This Tampermonkey userscript uses OCR (Optical Character Recognition) to automat
 - **Manual navigation detection** - knows when you click page buttons and handles it intelligently
 - **Debug panel** showing detailed timing, character counts, and script state
 - **Comprehensive settings dialog** for fine-tuning behavior
+- **✨ New: Theme System** - Switch between presets or pick a custom hex color
+- **✨ New: Real-time UI** - Page counter, current page timer, and total ETA
+- **✨ New: OCR Progress** - Live spinner showing image processing status
+- **✨ New: Spacebar Toggle** - Optional keyboard shortcut to pause/resume
 
 ---
 
@@ -57,11 +64,12 @@ This Tampermonkey userscript uses OCR (Optical Character Recognition) to automat
   - Click again to pause
   - Click again to resume
 - **Settings Button** (⚙): Just above the play button - opens configuration dialog
+- **Spacebar** (Optional): If enabled in settings, pressing space will toggle play/pause without clicking
 
 ### How It Works
 
 1. Script loads all pages in the gallery and runs OCR to extract text from each
-2. Debug panel shows progress: `Page 1: 142 chars`, `Page 2: processing...`, etc.
+2. Debug panel & OCR indicator show progress: `Page 1: 142 chars`, `Page 2: processing...`, etc.
 3. When you start auto-reading, the script calculates timing for each page:
    - **Formula**: `baseDelay + (charCount × charMultiplier)` seconds
    - Display a visual progress bar during the wait
@@ -93,13 +101,13 @@ Open the settings dialog using the ⚙ button. All values persist across browser
 | Setting | Default | Range | Description |
 |---------|---------|-------|-------------|
 | **Base Delay** | 3s | 0.5s–unlimited | Minimum time every page displays, before character count is added |
-| **Char Multiplier** | 0.03s | 0–unlimited | Additional seconds per character; total time = base + (chars × multiplier) |
+| **Char Multiplier** | 0.04s | 0–unlimited | Additional seconds per character; total time = base + (chars × multiplier) |
 | **OCR Fallback** | 15s | 1s–unlimited | If OCR is still running when page loads, use this timer; switches to char-based when OCR completes |
 
 **Examples**:
-- Page with 0 chars: `3 + (0 × 0.03) = 3s`
-- Page with 100 chars: `3 + (100 × 0.03) = 6s`
-- Page with 500 chars: `3 + (500 × 0.03) = 18s`
+- Page with 0 chars: `3 + (0 × 0.04) = 3s`
+- Page with 100 chars: `3 + (100 × 0.04) = 7s`
+- Page with 500 chars: `3 + (500 × 0.04) = 23s`
 
 ### Navigation Settings
 
@@ -107,6 +115,17 @@ Open the settings dialog using the ⚙ button. All values persist across browser
 |---------|---------|---------|-------------|
 | **Manual Navigation Forward** | `continue` / `pause` | `continue` | What happens when you click next page during auto-read |
 | **Manual Navigation Backward** | `continue` / `pause` | `pause` | What happens when you click previous page during auto-read |
+
+### UI & Theme Settings
+
+| Setting | Options | Default | Description |
+|---------|---------|---------|-------------|
+| **Theme Color** | Presets / Custom Hex | `nhentai Pink` | Changes accent color across all UI elements |
+| **Show OCR Progress** | On / Off | `On` | Displays live image processing counter |
+| **Show Page Counter** | On / Off | `On` | Displays `Current/Total` page indicator |
+| **Show Current Timer** | On / Off | `Off` | Displays countdown for the current page |
+| **Show Total Timer** | On / Off | `Off` | Displays estimated time to finish the gallery |
+| **Enable Spacebar** | On / Off | `Off` | Allows spacebar to toggle play/pause |
 
 ### Debug Settings
 
@@ -123,7 +142,7 @@ Open the settings dialog using the ⚙ button. All values persist across browser
 
 - **OCR performance**: On older devices or slow connections, Tesseract.js may take longer to process images. Adjust "OCR Fallback" time if pages advance too quickly/slowly.
 
-- **OCR accuracy**: It's extremely inaccurate on basically all metrics, exept for character count. It will often misread text, especially in stylized fonts or low-resolution images. The script uses character count only for timing, so this is not a functional issue.
+- **OCR accuracy**: It's extremely inaccurate on basically all metrics, except for character count. It will often misread text, especially in stylized fonts or low-resolution images. The script uses character count only for timing, so this is not a functional issue.
   
 ---
 
