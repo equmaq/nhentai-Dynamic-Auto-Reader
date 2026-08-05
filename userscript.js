@@ -4,8 +4,7 @@
 // @author       equmaq
 // @icon         https://www.google.com/s2/favicons?domain=nhentai.net
 // @namespace    http://tampermonkey.net
-// @updateURL    https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/main/userscript.js
-// @version      1.4.1
+// @version      1.4.2
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest
@@ -13,6 +12,8 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @connect      *
+// @downloadURL https://update.greasyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js
+// @updateURL https://update.greasyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.meta.js
 // ==/UserScript==
 
 (function () {
@@ -541,7 +542,14 @@
 
     // Spacebar toggle
     document.addEventListener("keydown", (e) => {
-        if (e.key === " " && !e.repeat && document.activeElement.tagName !== "INPUT" && userSettings.enableSpacebar) {
+        const active = document.activeElement;
+        const isEditable = active && (
+            active.tagName === "INPUT" ||
+            active.tagName === "TEXTAREA" ||
+            active.isContentEditable
+        );
+
+        if (e.key === " " && !e.repeat && !isEditable && userSettings.enableSpacebar) {
             e.preventDefault();
             toggleAutoRead();
         }
@@ -560,8 +568,8 @@
 
             const pageData = readerState.pageData[readerState.currentPage];
             let delayMs = pageData?.charCount !== undefined
-                ? getPageDelay(pageData.charCount)
-                : userSettings.ocrFallbackS * 1000;
+            ? getPageDelay(pageData.charCount)
+            : userSettings.ocrFallbackS * 1000;
 
             log(`P${readerState.currentPage}: ${(delayMs/1000).toFixed(1)}s`);
             updateUI();
