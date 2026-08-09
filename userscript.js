@@ -2,9 +2,9 @@
 // @name         nhentai Dynamic Auto Reader
 // @description  Automatically extracts text from nhentai galleries and auto-reads pages based on character count, with user-configurable timing and manual navigation handling.
 // @author       equmaq
-// @icon         https://www.google.com/s2/favicons?domain=nhentai.net
+// @icon         https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/refs/heads/main/icon.png
 // @namespace    http://tampermonkey.net
-// @version      1.4.2
+// @version      1.4.3
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest
@@ -12,8 +12,8 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @connect      *
-// @downloadURL https://update.greasyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js
-// @updateURL https://update.greasyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.meta.js
+// @downloadURL https://update.sleazyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js
+// @updateURL https://update.sleazyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.meta.js
 // ==/UserScript==
 
 (function () {
@@ -786,7 +786,7 @@
                 if (isGalleryPage()) {
                     log("🔄 Gallery detected, reloading page...");
                     clearAllIntervals(); // Stop watcher
-                    location.reload();   // Hard reload to initialize script on gallery
+                    location.reload(); // Hard reload to initialize script on gallery
                 }
             }, 1000);
 
