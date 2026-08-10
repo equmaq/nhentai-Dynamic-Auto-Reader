@@ -3,8 +3,9 @@
 // @description  Automatically extracts text from nhentai galleries and auto-reads pages based on character count, with user-configurable timing and manual navigation handling.
 // @author       equmaq
 // @icon         https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/refs/heads/main/icon.png
-// @namespace    http://tampermonkey.net
-// @version      1.4.3
+// @namespace    https://github.com/equmaq/nhentai-Dynamic-Auto-Reader
+// @supportURL   https://github.com/equmaq/nhentai-Dynamic-Auto-Reader/issues
+// @version      1.4.4
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest
