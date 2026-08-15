@@ -200,6 +200,8 @@ The script attempts to fetch images from multiple nhentai CDN hosts (`i1.nhentai
 - changelog.md drafted by AI and then reviewed by a human (GitHub Copilot)
 - General advice on how to best build this and what tools to use (e.g Tesseract.js) given by AI (Copilot and Gemini)
 
+---
+
 ## License
 
 See [LICENSE](LICENSE) file for details.
