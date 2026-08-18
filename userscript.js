@@ -5,7 +5,7 @@
 // @icon         https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/refs/heads/main/icon.png
 // @namespace    https://github.com/equmaq/nhentai-Dynamic-Auto-Reader
 // @supportURL   https://github.com/equmaq/nhentai-Dynamic-Auto-Reader/issues
-// @version      1.4.4
+// @version      1.5
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest
@@ -371,6 +371,8 @@
     }
 
     function updateUI() {
+        readerState.currentPage = getCurrentPageFromDOM();
+        readerState.maxPages = readerState.maxPages || getPageCount();
         pageCounterEl.textContent = `${readerState.currentPage}/${readerState.maxPages}`;
         totalTimerEl.textContent = `ETA: ${formatTime(calculateETA())}`;
     }
@@ -637,6 +639,10 @@
                 const behavior = dir === 'fwd' ? userSettings.manualNavForward : userSettings.manualNavBackward;
                 log(`↔ Manual ${dir} (${lastPage}→${cp})`);
                 readerState.currentPage = cp;
+                
+                // Keep the UI counter updated on manual navigation
+                updateUI();
+
                 if (readerState.isReading) {
                     if (behavior === 'pause') {
                         readerState.isPaused = true;
@@ -767,12 +773,18 @@
 
         applyVisibilitySettings();
 
-        // CSR Watcher Logic
+       // CSR Watcher Logic
         if (isGalleryPage()) {
             // We are already on a gallery page, proceed normally
             try {
                 await waitFor(() => document.querySelector(".num-pages"));
                 await waitFor(() => document.querySelector(CONFIG.PAGE_SELECTOR));
+                
+                // Initialize page stats and update UI right away
+                readerState.currentPage = getCurrentPageFromDOM();
+                readerState.maxPages = getPageCount();
+                updateUI();
+
                 await initOCR();
                 detectManualPageNavigation();
                 await processPages();
