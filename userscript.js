@@ -5,7 +5,7 @@
 // @icon         https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/refs/heads/main/icon.png
 // @namespace    https://github.com/equmaq/nhentai-Dynamic-Auto-Reader
 // @supportURL   https://github.com/equmaq/nhentai-Dynamic-Auto-Reader/issues
-// @version      1.5
+// @version      1.6
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest
@@ -13,8 +13,8 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @connect      *
-// @downloadURL https://update.sleazyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js
-// @updateURL https://update.sleazyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.meta.js
+// @downloadURL https://update.greasyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.user.js
+// @updateURL https://update.greasyfork.org/scripts/582763/nhentai%20Dynamic%20Auto%20Reader.meta.js
 // ==/UserScript==
 
 (function () {
@@ -82,7 +82,44 @@
         intervals.forEach(clearInterval);
         intervals.clear();
     }
-    window.addEventListener('beforeunload', clearAllIntervals);
+    window.addEventListener('beforeunload', () => {
+        clearAllIntervals();
+        releaseWakeLock();
+    });
+
+    /**********************
+     * SCREEN WAKE LOCK API
+     **********************/
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator && !wakeLock) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                log("🔒 Screen Wake Lock active");
+                wakeLock.addEventListener('release', () => {
+                    log("🔓 Screen Wake Lock released");
+                    wakeLock = null;
+                });
+            } catch (err) {
+                log(`⚠️ Wake Lock error: ${err.name}, ${err.message}`);
+            }
+        }
+    }
+
+    async function releaseWakeLock() {
+        if (wakeLock) {
+            await wakeLock.release();
+            wakeLock = null;
+        }
+    }
+
+    // Re-acquire wake lock if tab regains focus while actively reading
+    document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState === "visible" && readerState.isReading && !readerState.isPaused) {
+            await requestWakeLock();
+        }
+    });
 
     /**********************
      * CSS Injection
@@ -531,6 +568,7 @@
             await startReadingLoop();
         } else if (!readerState.isPaused) {
             readerState.isPaused = true;
+            await releaseWakeLock();
             updatePlayPauseBtn();
             log("⏸ Paused");
         } else {
@@ -563,71 +601,85 @@
         readerState.maxPages = getPageCount();
         log(`Loop: page ${readerState.currentPage}/${readerState.maxPages}`);
 
-        while (readerState.isReading && readerState.currentPage <= readerState.maxPages) {
-            if (readerState.isPaused) {
-                await new Promise(r => setTimeout(r, 100));
-                continue;
-            }
+        // Acquire Wake Lock when starting the loop
+        await requestWakeLock();
 
-            const pageData = readerState.pageData[readerState.currentPage];
-            let delayMs = pageData?.charCount !== undefined
-            ? getPageDelay(pageData.charCount)
-            : userSettings.ocrFallbackS * 1000;
-
-            log(`P${readerState.currentPage}: ${(delayMs/1000).toFixed(1)}s`);
-            updateUI();
-
-            const startTime = Date.now();
-            while (Date.now() - startTime < delayMs && readerState.isReading && !readerState.isPaused && !readerState.manualNavOccurred) {
-                const elapsed = Date.now() - startTime;
-                updateTimerBar(elapsed, delayMs);
-                currentPageTimerEl.textContent = formatTime((delayMs - elapsed) / 1000);
-                await new Promise(r => setTimeout(r, 100));
-            }
-
-            updateTimerBar(0, 1);
-            if (readerState.isPaused || !readerState.isReading) break;
-
-            if (readerState.manualNavOccurred) {
-                readerState.manualNavOccurred = false;
-                log(`⟲ Nav occurred, restarting P${readerState.currentPage}`);
-                continue;
-            }
-
-            if (readerState.currentPage >= readerState.maxPages) {
-                log(`✓ Finished`);
-                readerState.isReading = false;
-                updatePlayPauseBtn();
-                currentPageTimerEl.classList.add("nh-hidden");
-                totalTimerEl.classList.add("nh-hidden");
-                break;
-            }
-
-            navigateToNextPage();
-            let pageChanged = false;
-            for (let i = 0; i < 50; i++) {
-                await new Promise(r => setTimeout(r, 100));
-                const np = getCurrentPageFromDOM();
-                if (np !== readerState.currentPage) {
-                    readerState.currentPage = np;
-                    pageChanged = true;
-                    break;
+        try {
+            while (readerState.isReading && readerState.currentPage <= readerState.maxPages) {
+                if (readerState.isPaused) {
+                    await releaseWakeLock();
+                    await new Promise(r => setTimeout(r, 100));
+                    continue;
                 }
-            }
-            if (!pageChanged) {
-                readerState.currentPage = getCurrentPageFromDOM();
+
+                // Ensure wake lock is active if resumed
+                if (!wakeLock) {
+                    await requestWakeLock();
+                }
+
+                const pageData = readerState.pageData[readerState.currentPage];
+                let delayMs = pageData?.charCount !== undefined
+                ? getPageDelay(pageData.charCount)
+                : userSettings.ocrFallbackS * 1000;
+
+                log(`P${readerState.currentPage}: ${(delayMs/1000).toFixed(1)}s`);
+                updateUI();
+
+                const startTime = Date.now();
+                while (Date.now() - startTime < delayMs && readerState.isReading && !readerState.isPaused && !readerState.manualNavOccurred) {
+                    const elapsed = Date.now() - startTime;
+                    updateTimerBar(elapsed, delayMs);
+                    currentPageTimerEl.textContent = formatTime((delayMs - elapsed) / 1000);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                updateTimerBar(0, 1);
+                if (readerState.isPaused || !readerState.isReading) break;
+
+                if (readerState.manualNavOccurred) {
+                    readerState.manualNavOccurred = false;
+                    log(`⟲ Nav occurred, restarting P${readerState.currentPage}`);
+                    continue;
+                }
+
                 if (readerState.currentPage >= readerState.maxPages) {
+                    log(`✓ Finished`);
                     readerState.isReading = false;
                     updatePlayPauseBtn();
+                    currentPageTimerEl.classList.add("nh-hidden");
+                    totalTimerEl.classList.add("nh-hidden");
                     break;
                 }
+
+                navigateToNextPage();
+                let pageChanged = false;
+                for (let i = 0; i < 50; i++) {
+                    await new Promise(r => setTimeout(r, 100));
+                    const np = getCurrentPageFromDOM();
+                    if (np !== readerState.currentPage) {
+                        readerState.currentPage = np;
+                        pageChanged = true;
+                        break;
+                    }
+                }
+                if (!pageChanged) {
+                    readerState.currentPage = getCurrentPageFromDOM();
+                    if (readerState.currentPage >= readerState.maxPages) {
+                        readerState.isReading = false;
+                        updatePlayPauseBtn();
+                        break;
+                    }
+                }
             }
+        } finally {
+            // Release wake lock when reading stops, finishes, or errors out
+            await releaseWakeLock();
+            readerState.isReading = false;
+            updatePlayPauseBtn();
+            currentPageTimerEl.classList.add("nh-hidden");
+            totalTimerEl.classList.add("nh-hidden");
+            log("Stopped");
         }
-        readerState.isReading = false;
-        updatePlayPauseBtn();
-        currentPageTimerEl.classList.add("nh-hidden");
-        totalTimerEl.classList.add("nh-hidden");
-        log("Stopped");
     }
 
     function detectManualPageNavigation() {
