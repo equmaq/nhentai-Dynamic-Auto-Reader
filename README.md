@@ -48,10 +48,11 @@ This Tampermonkey userscript uses OCR (Optical Character Recognition) to automat
 - **Manual navigation detection** - knows when you click page buttons and handles it intelligently
 - **Debug panel** showing detailed timing, character counts, and script state
 - **Comprehensive settings dialog** for fine-tuning behavior
-- **✨ New: Theme System** - Switch between presets or pick a custom hex color
-- **✨ New: Real-time UI** - Page counter, current page timer, and total ETA
-- **✨ New: OCR Progress** - Live spinner showing image processing status
-- **✨ New: Spacebar Toggle** - Optional keyboard shortcut to pause/resume
+- **Theme System** - Switch between presets or pick a custom hex color
+- **Real-time UI** - Page counter, current page timer, and total ETA
+- **OCR Progress** - Live spinner showing image processing status
+- **Spacebar Toggle** - Optional keyboard shortcut to pause/resume
+- **✨ New: Fullscreen Playback** - Automatically enters fullscreen during playback and exits when paused or leaving the gallery
 
 ---
 
@@ -126,6 +127,7 @@ Open the settings dialog using the ⚙ button. All values persist across browser
 | **Show Current Timer** | On / Off | `Off` | Displays countdown for the current page |
 | **Show Total Timer** | On / Off | `Off` | Displays estimated time to finish the gallery |
 | **Enable Spacebar** | On / Off | `Off` | Allows spacebar to toggle play/pause |
+| **Enter Fullscreen During Playback** | On / Off | `On` | Enters fullscreen when playback starts or resumes, and exits when paused or stopped |
 
 ### Debug Settings
 

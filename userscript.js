@@ -64,6 +64,7 @@
         showCurrentTimer: GM_getValue("nh_showCurrentTimer", false),
         showTotalTimer: GM_getValue("nh_showTotalTimer", false),
         enableSpacebar: GM_getValue("nh_enableSpacebar", false),
+        enableFullscreen: GM_getValue("nh_enableFullscreen", true),
         // Phase 3: Theme
         themeName: GM_getValue("nh_themeName", "nhentai Pink"),
         customThemeColor: GM_getValue("nh_customThemeColor", "#ed2754")
@@ -85,6 +86,7 @@
     window.addEventListener('beforeunload', () => {
         clearAllIntervals();
         releaseWakeLock();
+        void exitFullscreen();
     });
 
     /**********************
@@ -327,6 +329,11 @@
                 <input type="checkbox" id="nh-enableSpacebar" style="margin-right: 8px;"> Enable Spacebar Toggle
             </label>
         </div>
+        <div style="margin-bottom: 8px;">
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                <input type="checkbox" id="nh-enableFullscreen" style="margin-right: 8px;"> Enter Fullscreen During Playback
+            </label>
+        </div>
         <div style="margin-bottom: 15px;">
             <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
                 <input type="checkbox" id="nh-debug" style="margin-right: 8px;"> Show Debug Panel
@@ -373,6 +380,20 @@
         if (btn) {
             log(`→ Clicking next`);
             btn.click();
+        }
+    }
+
+    function enterFullscreen() {
+        if (!userSettings.enableFullscreen || document.fullscreenElement || !document.documentElement.requestFullscreen) return;
+        document.documentElement.requestFullscreen().catch(err => log(`⚠️ Fullscreen error: ${err.message}`));
+    }
+
+    async function exitFullscreen() {
+        if (!document.fullscreenElement || !document.exitFullscreen) return;
+        try {
+            await document.exitFullscreen();
+        } catch (err) {
+            log(`⚠️ Fullscreen exit error: ${err.message}`);
         }
     }
 
@@ -492,6 +513,7 @@
         document.getElementById("nh-showCurrentTimer").checked = userSettings.showCurrentTimer;
         document.getElementById("nh-showTotalTimer").checked = userSettings.showTotalTimer;
         document.getElementById("nh-enableSpacebar").checked = userSettings.enableSpacebar;
+        document.getElementById("nh-enableFullscreen").checked = userSettings.enableFullscreen;
         document.getElementById("nh-debug").checked = DEBUG;
 
         initThemeSelect();
@@ -506,7 +528,7 @@
             ocrFallbackS: CONFIG.OCR_FALLBACK_S, manualNavForward: CONFIG.MANUAL_NAV_FORWARD,
             manualNavBackward: CONFIG.MANUAL_NAV_BACKWARD, showOcrProgress: true,
             showPageCounter: true, showCurrentTimer: false, showTotalTimer: false,
-            enableSpacebar: false, themeName: "nhentai Pink", customThemeColor: "#ed2754"
+            enableSpacebar: false, enableFullscreen: true, themeName: "nhentai Pink", customThemeColor: "#ed2754"
         });
         DEBUG = CONFIG.DEBUG_DEFAULT;
         settingsBtn.click();
@@ -525,6 +547,7 @@
         userSettings.showCurrentTimer = document.getElementById("nh-showCurrentTimer").checked;
         userSettings.showTotalTimer = document.getElementById("nh-showTotalTimer").checked;
         userSettings.enableSpacebar = document.getElementById("nh-enableSpacebar").checked;
+        userSettings.enableFullscreen = document.getElementById("nh-enableFullscreen").checked;
         DEBUG = document.getElementById("nh-debug").checked;
 
         // Save Theme
@@ -544,10 +567,12 @@
         GM_setValue("nh_showCurrentTimer", userSettings.showCurrentTimer);
         GM_setValue("nh_showTotalTimer", userSettings.showTotalTimer);
         GM_setValue("nh_enableSpacebar", userSettings.enableSpacebar);
+        GM_setValue("nh_enableFullscreen", userSettings.enableFullscreen);
         GM_setValue("nh_themeName", userSettings.themeName);
         GM_setValue("nh_customThemeColor", userSettings.customThemeColor);
         GM_setValue("nh_debug", DEBUG);
 
+        if (!userSettings.enableFullscreen) void exitFullscreen();
         debugBox.style.display = DEBUG ? "block" : "none";
         applyVisibilitySettings();
         settingsDialog.close();
@@ -559,6 +584,7 @@
      **********************/
     async function toggleAutoRead() {
         if (!readerState.isReading) {
+            enterFullscreen();
             readerState.isReading = true;
             readerState.isPaused = false;
             updatePlayPauseBtn();
@@ -569,9 +595,11 @@
         } else if (!readerState.isPaused) {
             readerState.isPaused = true;
             await releaseWakeLock();
+            await exitFullscreen();
             updatePlayPauseBtn();
             log("⏸ Paused");
         } else {
+            enterFullscreen();
             readerState.isPaused = false;
             updatePlayPauseBtn();
             log("▶ Resumed");
@@ -674,6 +702,7 @@
         } finally {
             // Release wake lock when reading stops, finishes, or errors out
             await releaseWakeLock();
+            await exitFullscreen();
             readerState.isReading = false;
             updatePlayPauseBtn();
             currentPageTimerEl.classList.add("nh-hidden");
@@ -851,6 +880,7 @@
                 if (isGalleryPage()) {
                     log("🔄 Gallery detected, reloading page...");
                     clearAllIntervals(); // Stop watcher
+                    void exitFullscreen();
                     location.reload(); // Hard reload to initialize script on gallery
                 }
             }, 1000);
