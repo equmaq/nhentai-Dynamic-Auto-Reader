@@ -5,7 +5,7 @@
 // @icon         https://raw.githubusercontent.com/equmaq/nhentai-Dynamic-Auto-Reader/refs/heads/main/icon.png
 // @namespace    https://github.com/equmaq/nhentai-Dynamic-Auto-Reader
 // @supportURL   https://github.com/equmaq/nhentai-Dynamic-Auto-Reader/issues
-// @version      1.6
+// @version      1.7
 // @license      GPL-3.0-only
 // @match        https://nhentai.net/*
 // @grant        GM_xmlhttpRequest

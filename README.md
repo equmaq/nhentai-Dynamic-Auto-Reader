@@ -1,4 +1,4 @@
-# nhentai Dynamic Auto Reader (v1.4)
+# nhentai Dynamic Auto Reader
 
 > Automatically extracts text from nhentai galleries and auto-reads pages based on character count, with user-configurable timing, real-time tracking, and dynamic theming.
 
